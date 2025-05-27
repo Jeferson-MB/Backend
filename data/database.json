@@ -8,7 +8,7 @@
     {
       "id": 2,
       "username": "Oscar",
-      "password": "clave123"
+      "password": "123"
     },
     {
       "id": 3,
@@ -28,61 +28,54 @@
       "filename": "ABBA.jpg",
       "comments": [
         {
-        "user_id": 2,
-        "text": "Que albun tan viejo."
+          "user_id": 1,
+          "text": "Es un albun que me recuerda a mi mama"
+        },
+        {
+          "user_id": 3,
+          "text": "Concuerdo"
         }
-
       ]
     },
     {
       "id": 2,
       "user_id": 2,
-      "filename": "Mana.jpg",
+      "filename": "Eminem.jpg",
       "comments": [
         {
-
+          "user_id": 3,
+          "text": "asdsdfd"
         }
       ]
     },
     {
       "id": 3,
       "user_id": 3,
-      "filename": "Nirvana.jpg",
-      "comments": [
-        {
-
-        }
-      ]
+      "filename": "Tyler.jpg",
+      "comments": []
     },
     {
       "id": 4,
       "user_id": 4,
-      "filename": "Tyler.jpg",
+      "filename": "Nirvana.jpg",
       "comments": [
         {
-
+          "user_id": 1,
+          "text": "Que buen albun para el recuerdo"
         }
       ]
     },
     {
       "id": 5,
       "user_id": 4,
-      "filename": "Fines.jpg",
-      "comments": [ 
-        {
-
-        }
-      ]
+      "filename": "Mana.jpg",
+      "comments": []
     },
     {
       "id": 6,
       "user_id": 3,
-      "filename": "Eminem.jpg",
-      "comments": [
-        {
-
-        }
-      ]
+      "filename": "Fines.jpg",
+      "comments": []
     }
   ]
 }
