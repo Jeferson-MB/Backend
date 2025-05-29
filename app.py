@@ -6,9 +6,9 @@ from config import Config
 from utils.setup import init_database, init_directories
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app) # Cors para habilitar interacción con el navegador web
 
-
+# Configuración de archivo de Base de Datos JSON
 app.config.from_object(Config)
 init_directories()
 init_database()
