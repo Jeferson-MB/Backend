@@ -8,4 +8,5 @@ def init_directories():
 def init_database():
     if not os.path.exists(Config.DATABASE_FILE):
         with open(Config.DATABASE_FILE, 'w') as f:
-            json.dumps({ "users": [] }, f) # Contenido de la base de datos JSON al inicio
+            # Cambiar json.dumps por json.dump
+            json.dump({"images": []}, f, indent=2)  # Contenido de la base de datos JSON al inicio
