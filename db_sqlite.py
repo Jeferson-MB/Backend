@@ -12,11 +12,14 @@ def get_db():
     return db
 
 # Metodo para consultar si existe algo en la base de datos
-def query_db(query, args=(), one=False):
-    cur = get_db().execute(query, args)
+def query_db(query, args=(), one=False, commit=False):
+    db = get_db()
+    cur = db.execute(query, args)
+    if commit:
+        db.commit()
     rv = cur.fetchall()
     cur.close()
-    return(rv[0] if rv else None) if one else rv
+    return (rv[0] if rv else None) if one else rv
 
 # Método para modificar datos existentes en la DB
 def modify_db(query, args=()):
@@ -24,6 +27,7 @@ def modify_db(query, args=()):
     cur = db.execute(query, args)
     db.commit()
     cur.close()
+    return cur.lastrowid
 
 def close_connection(exception):
     db = getattr(g, '_database', None)
