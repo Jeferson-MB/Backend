@@ -95,3 +95,17 @@ def register():
 def get_users():
     users = query_db('SELECT id, username FROM users')
     return jsonify([dict(user) for user in users]), 200
+
+@auth_bp.route('/profile/<int:user_id>', methods=["GET"])
+def get_profile(user_id):
+    user = query_db(
+        'SELECT username, profile_photo FROM users WHERE id = ?',
+        (user_id,), one=True
+    )
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+
+    return jsonify({
+        'username': user['username'],
+        'photo': user['profile_photo']  # Esto es base64 o None
+    }), 200
