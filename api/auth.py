@@ -7,24 +7,21 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=["POST"])
 def login():
-    data = request.json # Datos que vienen de postman (cliente)
-    #db = load_db() # Datos que estan en el servidor (DB)
+    data = request.json
     user = query_db(
-        'SELECT * FROM users WHERE username = ? AND password = ?',
-        (data['username'], ), one=True
+        'SELECT * FROM users WHERE username = ?',
+        (data['username'],), one=True
     )
 
     if user:
         stored_hash = user['password']
-
-        # Contraseñas: 1 manda el cliente, 2: En base de datos
-        password_bytes = data['password'].encode['utf-8']
+        password_bytes = data['password'].encode('utf-8')
         stored_hash_bytes = stored_hash.encode('utf-8')
 
         if bcrypt.checkpw(password_bytes, stored_hash_bytes):
             return jsonify({'mensaje': 'Login exitoso', 'user_id': user['id']}), 200
-        
-    return jsonify({ 'error': 'Credenciales inválidas' }), 401
+
+    return jsonify({'error': 'Credenciales inválidas'}), 401
 
 @auth_bp.route('/register', methods=["POST"])
 def register():

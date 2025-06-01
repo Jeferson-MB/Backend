@@ -28,3 +28,4 @@ def add_comment(image_id):
             return jsonify({ 'message': 'Comentario agregado' }), 201
     return jsonify({ 'error': 'Imagen no encontrada' }), 404
 
+
