@@ -5,6 +5,9 @@ from utils.setup import init_database, init_directories
 from db_sqlite import close_connection
 from flask import Flask
 from flask_cors import CORS
+import base64
+from flask import jsonify
+
 
 app = Flask(__name__)
 CORS(app)
