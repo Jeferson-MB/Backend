@@ -1,13 +1,13 @@
-from flask import Flask
-from flask_cors import CORS
 import os
 from api import create_api
 from config import Config
 from utils.setup import init_database, init_directories
 from db_sqlite import close_connection
+from flask import Flask
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app) # Cors para habilitar interacción con el navegador web
+CORS(app)
 
 # Configuración de archivo de Base de Datos JSON
 app.config.from_object(Config)
