@@ -38,3 +38,12 @@ def close_connection(exception):
 def init_db():
     """Inicializa la base de datos dentro del contexto de la aplicación"""
     pass  # La inicialización real se hace en init_sqlite.py
+
+# ===========================
+# NUEVA FUNCIÓN PARA LOGIN
+# ===========================
+def get_user_by_username(username):
+    row = query_db("SELECT username, password, name FROM users WHERE username = ?", [username], one=True)
+    if row:
+        return {'username': row['username'], 'password': row['password'], 'name': row['name']}
+    return None
