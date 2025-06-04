@@ -7,8 +7,6 @@ from api import create_api
 from config import Config
 from utils.setup import init_database, init_directories
 from db_sqlite import close_connection, init_db
-from api.images import images_bp
-from api.upload import upload_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -19,12 +17,15 @@ app.config.from_object(Config)
 # Inicialización de directorios y base de datos
 init_directories()
 init_database()
-init_db()  # Desde db_sqlite.py si lo necesitas explícitamente
 
-# Registro de Blueprints
+# Inicializar la base de datos dentro del contexto de la aplicación
+with app.app_context():
+    from db_sqlite import get_db
+    # Esto forzará la creación de la conexión si es necesario
+    get_db()
+
+# Registro de Blueprints - SOLO usar create_api
 create_api(app)
-app.register_blueprint(images_bp)
-app.register_blueprint(upload_bp)
 
 # Ruta de prueba
 @app.route('/')

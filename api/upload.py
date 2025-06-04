@@ -14,7 +14,8 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@upload_bp.route('/api/upload', methods=['POST'])
+# CAMBIADO: Quitar /api del route porque ya se agrega en el registro del blueprint
+@upload_bp.route('/upload', methods=['POST'])
 def upload_file():
     if 'image' not in request.files:
         return jsonify({'error': 'No se encontró archivo'}), 400
@@ -34,12 +35,15 @@ def upload_file():
             # Crear data URL completa
             data_url = f"data:{mime_type};base64,{base64_data}"
             
+            # Obtener user_id del form data o usar 1 por defecto
+            user_id = request.form.get('user_id', 1)
+            
             # Guardar en base de datos
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
                 "INSERT INTO images (user_id, image_base64, created_at) VALUES (?, ?, ?)",
-                (1, data_url, datetime.datetime.now())  # user_id = 1 por defecto
+                (user_id, data_url, datetime.datetime.now())
             )
             db.commit()
             
@@ -49,6 +53,7 @@ def upload_file():
             }), 201
             
         except Exception as e:
+            print(f"Error en upload_file: {e}")
             return jsonify({'error': f'Error procesando archivo: {str(e)}'}), 500
     
     return jsonify({'error': 'Tipo de archivo no permitido'}), 400
