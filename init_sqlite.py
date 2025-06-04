@@ -24,7 +24,18 @@ cursor.execute('''
     )
 ''')
 
-# Verificar columnas existentes
+# Crear tabla 'images' si no existe
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS images (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        image_base64 TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users (id)
+    )
+''')
+
+# Verificar columnas existentes en users
 cursor.execute("PRAGMA table_info(users)")
 columns = [column[1] for column in cursor.fetchall()]
 
@@ -64,5 +75,4 @@ else:
 conn.commit()
 conn.close()
 
-print("Base de datos y tabla 'users' creadas/actualizadas correctamente")
-
+print("Base de datos y tablas 'users' e 'images' creadas/actualizadas correctamente")
