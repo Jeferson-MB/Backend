@@ -16,6 +16,36 @@ def get_images():
     db = load_db()
     return jsonify(db["images"])
 
+@images_bp.route('/images/<int:image_id>/like', methods=['POST', 'OPTIONS'])
+def like_image(image_id):
+    if request.method == 'OPTIONS':
+        response = jsonify({'ok': True})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST,OPTIONS')
+        return response
+
+    data = request.get_json()
+    user_id = data.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Falta user_id'}), 400
+
+    db = load_db()
+    for image in db['images']:
+        if image['id'] == image_id:
+            if 'likes' not in image or not isinstance(image['likes'], list):
+                image['likes'] = []
+            # Like/unlike
+            if user_id in image['likes']:
+                image['likes'].remove(user_id)
+            else:
+                image['likes'].append(user_id)
+            save_db(db)
+            response = jsonify({'likes': image['likes']})
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+    return jsonify({'error': 'Imagen no encontrada'}), 404
+
 @images_bp.route('/upload', methods=["POST"])
 def upload():
     user_id = request.form['user_id']
@@ -30,7 +60,8 @@ def upload():
             'user_id': int(user_id),
             'filename': file.filename,
             'filedata': encoded_data,
-            'comments': []
+            'comments': [],
+            'likes': []  # Inicializa likes vacío
         }
         db['images'].append(new_image)
         save_db(db)
