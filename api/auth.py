@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify
-import json
 import bcrypt
 import base64
 from db_sqlite import query_db, modify_db
@@ -9,19 +8,21 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=["POST"])
 def login():
     data = request.json
-    user = query_db(
-        'SELECT * FROM users WHERE username = ?',
-        (data['username'],), one=True
-    )
-
+    user = query_db('SELECT * FROM users WHERE username = ?', (data['username'],), one=True)
     if user:
         stored_hash = user['password']
-        password_bytes = data['password'].encode('utf-8')
-        stored_hash_bytes = stored_hash.encode('utf-8')
-
-        if bcrypt.checkpw(password_bytes, stored_hash_bytes):
-            return jsonify({'mensaje': 'Login exitoso', 'user_id': user['id']}), 200
-
+        password = data['password']
+        # Validar que el hash exista, sea string, y tenga formato bcrypt
+        if isinstance(stored_hash, str) and stored_hash.startswith("$2b$"):
+            try:
+                password_bytes = password.encode('utf-8')
+                stored_hash_bytes = stored_hash.encode('utf-8')
+                if bcrypt.checkpw(password_bytes, stored_hash_bytes):
+                    return jsonify({'mensaje': 'Login exitoso', 'user_id': user['id']}), 200
+            except Exception as e:
+                return jsonify({'error': 'Error al verificar la contraseña.'}), 401
+        # Si el hash no es válido, no intentes login
+        return jsonify({'error': 'Credenciales inválidas o usuario dañado. Contacta al administrador.'}), 401
     return jsonify({'error': 'Credenciales inválidas'}), 401
 
 @auth_bp.route('/register', methods=["POST"])
@@ -109,6 +110,7 @@ def get_profile(user_id):
         'username': user['username'],
         'photo': user['profile_photo']  # Esto es base64 o None
     }), 200
+
 @auth_bp.route('/profile/<int:user_id>/photo', methods=['PUT'])
 def update_profile_photo(user_id):
     data = request.json
@@ -116,7 +118,6 @@ def update_profile_photo(user_id):
     if not new_photo:
         return jsonify({'error': 'Falta la imagen'}), 400
     try:
-        # Validar que la foto sea base64
         base64.b64decode(new_photo)
     except Exception:
         return jsonify({'error': 'Imagen inválida'}), 400
@@ -127,34 +128,6 @@ def update_profile_photo(user_id):
     )
 
     # Devuelve los datos actualizados del usuario
-    user = query_db(
-        'SELECT username, profile_photo FROM users WHERE id = ?',
-        (user_id,), one=True
-    )
-    return jsonify({
-        'success': True,
-        'message': 'Foto de perfil actualizada',
-        'username': user['username'],
-        'photo': user['profile_photo']
-    }), 200
-@auth_bp.route('/profile/<int:user_id>/photo', methods=['PUT'])
-def update_profile_photo(user_id):
-    data = request.json
-    new_photo = data.get('profile_photo')
-    if not new_photo:
-        return jsonify({'error': 'Falta la imagen'}), 400
-    try:
-        import base64
-        base64.b64decode(new_photo)
-    except Exception:
-        return jsonify({'error': 'Imagen inválida'}), 400
-
-    from db_sqlite import modify_db, query_db
-    modify_db(
-        'UPDATE users SET profile_photo = ? WHERE id = ?',
-        (new_photo, user_id)
-    )
-
     user = query_db(
         'SELECT username, profile_photo FROM users WHERE id = ?',
         (user_id,), one=True
