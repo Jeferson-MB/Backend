@@ -21,6 +21,13 @@ create_api(app)
 def teardown_db(exception):
     close_connection(exception)
 
+# ---- AGREGADO: POLÍTICA DE SEGURIDAD CSP ----
+@app.after_request
+def csp_headers(response):
+    response.headers['Content-Security-Policy'] = "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self' 'unsafe-inline';"
+    return response
+# ---------------------------------------------
+
 # Ruta de prueba
 @app.route('/')
 def hello_world():
