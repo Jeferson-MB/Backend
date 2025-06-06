@@ -65,4 +65,3 @@ conn.commit()
 conn.close()
 
 print("Base de datos y tabla 'users' creadas/actualizadas correctamente")
-

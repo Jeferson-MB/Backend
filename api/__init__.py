@@ -1,6 +1,6 @@
 from .auth import auth_bp
 from .images import images_bp
-from .comment import comments_bp
+from .comments import comments_bp
 
 def create_api(app):
     # /api/login
