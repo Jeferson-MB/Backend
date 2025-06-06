@@ -1,7 +1,17 @@
 from flask import Blueprint, current_app, request, jsonify
-import json, base64
+import cloudinary
+import cloudinary.uploader
+import os
+import json
 
 images_bp = Blueprint('images', __name__)
+
+# Configuración de Cloudinary usando variables de entorno
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET')
+)
 
 def load_db():
     with open(current_app.config['DATABASE_FILE']) as f:
@@ -18,45 +28,26 @@ def get_images():
 
 @images_bp.route('/images', methods=["POST"])
 def upload_image():
-    if request.is_json:
-        data = request.get_json()
-        filedata = data.get('filedata')
-        filename = data.get('filename')
-        user_id = data.get('user_id')
-        if not all([filedata, filename, user_id]):
-            return jsonify({"error": "Faltan datos"}), 400
-        db = load_db()
-        new_id = (max([img['id'] for img in db['images']] or [0]) + 1)
-        new_image = {
-            'id': new_id,
-            'user_id': int(user_id),
-            'filename': filename,
-            'filedata': filedata,
-            'comments': [],
-            'likes': []
-        }
-        db['images'].append(new_image)
-        save_db(db)
-        return jsonify({'message': 'Imagen subida', 'id': new_id}), 201
-
     user_id = request.form.get('user_id')
     file = request.files.get('image')
     if file and user_id:
-        file_data = file.read()
-        encoded_data = base64.b64encode(file_data).decode('utf-8')
+        # Subir imagen a Cloudinary
+        result = cloudinary.uploader.upload(file)
+        image_url = result['secure_url']
+
         db = load_db()
         new_id = (max([img['id'] for img in db['images']] or [0]) + 1)
         new_image = {
             'id': new_id,
             'user_id': int(user_id),
             'filename': file.filename,
-            'filedata': encoded_data,
+            'url': image_url,
             'comments': [],
             'likes': []
         }
         db['images'].append(new_image)
         save_db(db)
-        return jsonify({'message': 'Imagen subida', 'id': new_id}), 201
+        return jsonify({'message': 'Imagen subida', 'id': new_id, 'url': image_url}), 201
 
     return jsonify({'error': 'No se recibió la imagen'}), 400
 
