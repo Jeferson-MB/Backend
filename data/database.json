@@ -9,6 +9,10 @@
         {
           "user_id": 1,
           "text": "El mejor albun"
+        },
+        {
+          "user_id": 3,
+          "text": "Es un albun que me recuerda a mi mama"
         }
       ]
     },
@@ -20,6 +24,10 @@
       "comments": [
         {
           "user_id": 1,
+          "text": "Hola"
+        },
+        {
+          "user_id": 5,
           "text": "Hola"
         }
       ]
